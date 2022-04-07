@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"io/ioutil"
-	crypto2 "kms/crypto"
-	"kms/log"
-	"kms/models"
 	"net/http"
+	crypto2 "nitro-enclave-kms-sdk/crypto"
+	"nitro-enclave-kms-sdk/log"
+	"nitro-enclave-kms-sdk/models"
 	"strings"
 	"time"
 )

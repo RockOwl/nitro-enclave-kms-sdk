@@ -6,8 +6,8 @@ import (
 	"github.com/hf/nsm"
 	"github.com/hf/nsm/request"
 	"github.com/pkg/errors"
-	"kms/log"
 	"math/big"
+	"nitro-enclave-kms-sdk/log"
 )
 
 func generateBigPrime() (*big.Int, error) {

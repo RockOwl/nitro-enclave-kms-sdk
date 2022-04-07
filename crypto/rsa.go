@@ -5,7 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"github.com/pkg/errors"
-	"kms/log"
+	"nitro-enclave-kms-sdk/log"
 )
 
 func GenerateRsaKey(bits int) (*rsa.PrivateKey, []byte, error) {
