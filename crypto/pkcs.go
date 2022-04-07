@@ -2,9 +2,9 @@ package crypto
 
 import (
 	"crypto"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/log"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/pkcs7"
 	"github.com/pkg/errors"
-	"nitro-enclave-kms-sdk/log"
-	"nitro-enclave-kms-sdk/pkcs7"
 )
 
 func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data []byte) ([]byte, error) {

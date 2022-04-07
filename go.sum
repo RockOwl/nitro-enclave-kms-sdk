@@ -1,5 +1,3 @@
-github.com/RockOwl/nitro-enclave-kms-sdk v0.1.0 h1:DFTfijp0wpN1+8adYS43in7HTEj9fKU75YDqp2PEZKo=
-github.com/RockOwl/nitro-enclave-kms-sdk v0.1.0/go.mod h1:11n+WB31BmyIeEepytAnKZfePwbCwDm5m1dDxLQLv4I=
 github.com/fxamacker/cbor/v2 v2.2.0 h1:6eXqdDDe588rSYAi1HfZKbx6YYQO4mxQ9eC6xYpU/JQ=
 github.com/fxamacker/cbor/v2 v2.2.0/go.mod h1:TA1xS00nchWmaBnEIxPSE5oHLuJBAVvqrtAnWBwBCVo=
 github.com/hf/nsm v0.0.0-20211106132757-1ae65a6a69ae h1:oCc+sRCVfMs1iL5yr7zen5K4+HNp4s/jHr+C9TacpWQ=

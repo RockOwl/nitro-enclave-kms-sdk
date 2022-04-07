@@ -3,12 +3,12 @@ package kms
 import (
 	"encoding/json"
 	"fmt"
+	crypto2 "github.com/brodyxchen/nitro-enclave-kms-sdk/crypto"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/log"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/models"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
-	crypto2 "nitro-enclave-kms-sdk/crypto"
-	"nitro-enclave-kms-sdk/log"
-	"nitro-enclave-kms-sdk/models"
 	"strings"
 	"time"
 )
