@@ -1,4 +1,4 @@
-module kms
+module nitro-enclave-kms-sdk
 
 go 1.16
 
