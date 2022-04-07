@@ -9,7 +9,6 @@ import (
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/models"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/nitro"
 	_ "github.com/brodyxchen/nitro-enclave-kms-sdk/randseed"
-	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
 	"net/http"
 	"time"
 )
@@ -99,7 +98,7 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 	return plainBytes, nil
 }
 
-func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) ([]byte, []byte, error) {
+func (cli *Client) GenerateDataKey(keySpec DataKeySpec, kmsKeyId string) ([]byte, []byte, error) {
 	awsTarget := "TrentService.GenerateDataKey"
 
 	recipient, err := cli.withRecipientInfo()

@@ -1,4 +1,4 @@
-package types
+package kms
 
 type DataKeySpec string
 
