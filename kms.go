@@ -9,6 +9,7 @@ import (
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/models"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/nitro"
 	_ "github.com/brodyxchen/nitro-enclave-kms-sdk/randseed"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
 	"net/http"
 	"time"
 )
@@ -16,6 +17,9 @@ import (
 const (
 	amzDateTimeFormat = "20060102T150405Z"
 	amzDateFormat     = "20060102"
+
+	DataKeySpecAes256 types.DataKeySpec = "AES_256"
+	DataKeySpecAes128 types.DataKeySpec = "AES_128"
 )
 
 func NewClient() (*Client, error) {
@@ -98,7 +102,7 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 	return plainBytes, nil
 }
 
-func (cli *Client) GenerateDataKey(keySpec DataKeySpec, kmsKeyId string) ([]byte, []byte, error) {
+func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) ([]byte, []byte, error) {
 	awsTarget := "TrentService.GenerateDataKey"
 
 	recipient, err := cli.withRecipientInfo()

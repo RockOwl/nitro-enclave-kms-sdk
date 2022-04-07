@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/brodyxchen/nitro-enclave-kms-sdk"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
 )
 
 type ErrorResponse struct {
@@ -32,8 +32,8 @@ type GenerateRandomResponse struct {
 type GenerateDataKeyRequest struct {
 	KeyId       string
 	GrantTokens []string
-	KeySpec     kms.DataKeySpec // AES_128  AES_256
-	Recipient   RecipientInfo   `json:"Recipient"`
+	KeySpec     types.DataKeySpec // AES_128  AES_256
+	Recipient   RecipientInfo     `json:"Recipient"`
 }
 type GenerateDataKeyResponse struct {
 	CiphertextBlob []byte
@@ -45,13 +45,13 @@ type GenerateDataKeyResponse struct {
 
 type DecryptRequest struct {
 	CiphertextBlob      []byte
-	EncryptionAlgorithm kms.EncryptionAlgorithmSpec
+	EncryptionAlgorithm types.EncryptionAlgorithmSpec
 	GrantTokens         []string
 	KeyId               string
 	Recipient           RecipientInfo `json:"Recipient"`
 }
 type DecryptResponse struct {
-	EncryptionAlgorithm kms.EncryptionAlgorithmSpec
+	EncryptionAlgorithm types.EncryptionAlgorithmSpec
 	KeyId               string
 
 	Plaintext              []byte // enclave-kms中，此为null
