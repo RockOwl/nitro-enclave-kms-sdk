@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"github.com/RockOwl/nitro-enclave-kms-sdk/log"
 	"github.com/pkg/errors"
+	"nitro-enclave-kms-sdk/log"
 )
 
 func GenerateRsaKey(bits int) (*rsa.PrivateKey, []byte, error) {
