@@ -1,4 +1,4 @@
-module nitro-enclave-kms-sdk
+module github.com/RockOwl/nitro-enclave-kms-sdk
 
 go 1.16
 

@@ -1,6 +1,6 @@
 package models
 
-import "nitro-enclave-kms-sdk/types"
+import "github.com/RockOwl/nitro-enclave-kms-sdk/types"
 
 type ErrorResponse struct {
 	ErrType    string `json:"__type"`

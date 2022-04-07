@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"kms"
+	kms "github.com/RockOwl/nitro-enclave-kms-sdk"
 )
 
 func main() {

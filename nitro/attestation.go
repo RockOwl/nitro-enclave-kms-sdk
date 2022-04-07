@@ -3,11 +3,11 @@ package nitro
 import (
 	"crypto/rand"
 	"fmt"
+	"github.com/RockOwl/nitro-enclave-kms-sdk/log"
 	"github.com/hf/nsm"
 	"github.com/hf/nsm/request"
 	"github.com/pkg/errors"
 	"math/big"
-	"nitro-enclave-kms-sdk/log"
 )
 
 func generateBigPrime() (*big.Int, error) {
