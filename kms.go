@@ -12,6 +12,7 @@ import (
 	_ "github.com/brodyxchen/nitro-enclave-kms-sdk/randseed"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
 	"golang.org/x/net/proxy"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -33,6 +34,7 @@ func NewClient() (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	cli.health()
 	return cli, nil
 }
 
@@ -78,6 +80,24 @@ func (cli *Client) init() error {
 	cli.rsaKey = priKey
 	cli.rsaPubKey = pubKey
 	return nil
+}
+
+func (cli *Client) health() {
+	go func() {
+		for {
+			rsp, err := cli.httpCli.Get("https://www.baidu.com")
+			if err != nil {
+				fmt.Println("get baidu.com err : ", err)
+			} else {
+				body, err := ioutil.ReadAll(rsp.Body)
+				fmt.Printf("get baidu.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
+			}
+
+			time.Sleep(time.Second * 20)
+		}
+
+	}()
+
 }
 
 func (cli *Client) SetRegion(region string) {
