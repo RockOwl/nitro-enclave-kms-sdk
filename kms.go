@@ -50,11 +50,11 @@ type Client struct {
 	httpCli *http.Client
 }
 
-func (cli *Client) init() error {
+func (cli *Client) withSocksProxy() (*http.Client, error) {
 	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "can't connect to the proxy:", err)
-		return err
+		return nil, err
 	}
 
 	dc := dialer.(interface {
@@ -66,8 +66,18 @@ func (cli *Client) init() error {
 	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 180}
 	// set our socks5 as the dialer
 	httpTransport.DialContext = dc.DialContext
+	return httpClient, nil
+}
+func (cli *Client) withHttpProxy() (*http.Client, error) {
+	return &http.Client{
+		Timeout: time.Second * 180,
+	}, nil
+}
 
-	cli.httpCli = httpClient
+func (cli *Client) init() error {
+	httpCli, _ := cli.withHttpProxy()
+
+	cli.httpCli = httpCli
 
 	priKey, pubKey, err := crypto.GenerateRsaKey(2048)
 	if err != nil {
