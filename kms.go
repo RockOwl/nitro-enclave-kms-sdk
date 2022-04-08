@@ -1,6 +1,7 @@
 package kms
 
 import (
+	"context"
 	crypto2 "crypto"
 	"encoding/base64"
 	"fmt"
@@ -10,7 +11,10 @@ import (
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/nitro"
 	_ "github.com/brodyxchen/nitro-enclave-kms-sdk/randseed"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
+	"golang.org/x/net/proxy"
+	"net"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -45,9 +49,23 @@ type Client struct {
 }
 
 func (cli *Client) init() error {
-	cli.httpCli = &http.Client{
-		Timeout: time.Second * 30,
+	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "can't connect to the proxy:", err)
+		return err
 	}
+
+	dc := dialer.(interface {
+		DialContext(ctx context.Context, network, addr string) (net.Conn, error)
+	})
+
+	// setup a http client
+	httpTransport := &http.Transport{}
+	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 30}
+	// set our socks5 as the dialer
+	httpTransport.DialContext = dc.DialContext
+
+	cli.httpCli = httpClient
 
 	priKey, pubKey, err := crypto.GenerateRsaKey(2048)
 	if err != nil {

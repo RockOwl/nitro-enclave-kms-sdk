@@ -1,3 +1,5 @@
+// +build !linux
+
 package randseed
 
 import "github.com/brodyxchen/nitro-enclave-kms-sdk/log"

@@ -112,6 +112,8 @@ func (cli *Client) withHeaders(target string, reqData []byte) map[string]string 
 }
 
 func (cli *Client) httpPost(url string, reqBody []byte, headers map[string]string) ([]byte, error) {
+	fmt.Printf("kmsCli.httpPost() url=%v\n, reqBody=%+v\n, headers=%+v\n", url, reqBody, headers)
+
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(reqBody)))
 	if err != nil {
 		log.Error("httpPost() NewRequest() err : ", err)
