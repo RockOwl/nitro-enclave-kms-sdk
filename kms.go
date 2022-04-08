@@ -61,7 +61,7 @@ func (cli *Client) init() error {
 
 	// setup a http client
 	httpTransport := &http.Transport{}
-	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 30}
+	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 180}
 	// set our socks5 as the dialer
 	httpTransport.DialContext = dc.DialContext
 
