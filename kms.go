@@ -85,15 +85,25 @@ func (cli *Client) init() error {
 func (cli *Client) health() {
 	go func() {
 		for {
-			rsp, err := cli.httpCli.Get("https://www.baidu.com")
+			rsp, err := cli.httpCli.Get("http://www.baidu.com")
 			if err != nil {
-				fmt.Println("get baidu.com err : ", err)
+				fmt.Println("get http://baidu.com err : ", err)
 			} else {
 				body, err := ioutil.ReadAll(rsp.Body)
-				fmt.Printf("get baidu.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
+				fmt.Printf("get http://baidu.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
 			}
 
-			time.Sleep(time.Second * 20)
+			time.Sleep(time.Second * 15)
+
+			rsp, err = cli.httpCli.Get("https://www.qq.com")
+			if err != nil {
+				fmt.Println("get https://qq.com err : ", err)
+			} else {
+				body, err := ioutil.ReadAll(rsp.Body)
+				fmt.Printf("get https://qq.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
+			}
+
+			time.Sleep(time.Second * 15)
 		}
 
 	}()
