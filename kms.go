@@ -45,7 +45,7 @@ type Client struct {
 	sessionToken    string
 
 	rsaKey    crypto2.PrivateKey
-	rsaPubKey []byte
+	rsaPubKey []byte // PKIXPublicKey
 
 	httpCli *http.Client
 }

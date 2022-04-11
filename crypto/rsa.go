@@ -20,9 +20,9 @@ func GenerateRsaKey(bits int) (*rsa.PrivateKey, []byte, error) {
 	//	return nil, nil, err
 	//}
 
-	x509PubKey := x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)
+	x509PubKey, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
 	if err != nil {
-		log.Error("GenerateRsaKey() x509.MarshalPKCS1PublicKey err : ", err)
+		log.Error("GenerateRsaKey() x509.MarshalPKIXPublicKey err : ", err)
 		return nil, nil, errors.WithStack(err)
 	}
 
