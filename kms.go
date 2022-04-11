@@ -146,7 +146,7 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 	}
 
 	var rsp models.GenerateRandomResponse
-	err = cli.callKms(awsTarget, req, rsp)
+	err = cli.callKms(awsTarget, req, &rsp)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 	}
 
 	var rsp models.GenerateDataKeyResponse
-	err = cli.callKms(awsTarget, req, rsp)
+	err = cli.callKms(awsTarget, req, &rsp)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -205,7 +205,7 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 	}
 
 	var rsp models.DecryptResponse
-	err = cli.callKms(awsTarget, req, rsp)
+	err = cli.callKms(awsTarget, req, &rsp)
 	if err != nil {
 		return nil, err
 	}
