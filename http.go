@@ -16,7 +16,7 @@ import (
 // https://docs.aws.amazon.com/zh_cn/general/latest/gr/sigv4-create-canonical-request.html
 
 func (cli *Client) callKms(target string, reqPtr interface{}, rspPtr interface{}) error {
-	url := fmt.Sprintf("https://kms.%s.amazonaws.com", cli.region)
+	url := fmt.Sprintf("https://kms.%s.amazonaws.com/", cli.region)
 
 	reqData, err := json.Marshal(reqPtr)
 	if err != nil {
@@ -45,10 +45,10 @@ func (cli *Client) withHeaders(target string, reqData []byte) map[string]string 
 
 	awsService := "kms"
 	host := fmt.Sprintf("kms.%s.amazonaws.com", cli.region)
-	contentType := "application/x-amz-json-1.1'"
+	contentType := "application/x-amz-json-1.1" //todo 这里末尾多了一个'
 
-	now := time.Now()
-	amzDateTime := now.Format(amzDateTimeFormat) // %Y%m%dT%H%M%SZ
+	nowUtc := time.Now().UTC()                      //todo 这里必须是utc
+	amzDateTime := nowUtc.Format(amzDateTimeFormat) // %Y%m%dT%H%M%SZ
 
 	// 创建规范请求
 	httpMethod := "POST"
@@ -74,7 +74,7 @@ func (cli *Client) withHeaders(target string, reqData []byte) map[string]string 
 	reqBuilder.WriteString(reqHash) // 最后没有\n
 
 	CanonicalRequest := reqBuilder.String()
-	dateStamp := now.Format(amzDateFormat)
+	dateStamp := nowUtc.Format(amzDateFormat)
 
 	// 创建待签字符串
 	algorithm := "AWS4-HMAC-SHA256"
@@ -112,7 +112,9 @@ func (cli *Client) withHeaders(target string, reqData []byte) map[string]string 
 }
 
 func (cli *Client) httpPost(url string, reqBody []byte, headers map[string]string) ([]byte, error) {
-	fmt.Printf("kmsCli.httpPost() url=%v\n, headers=%+v\n", url, headers)
+	fmt.Printf("kmsCli.httpPost() url=%v\n", url)
+	fmt.Printf("kmsCli.httpPost() req=%+v\n", string(reqBody))
+	fmt.Printf("kmsCli.httpPost() headers=%+v\n", headers)
 
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(reqBody)))
 	if err != nil {
