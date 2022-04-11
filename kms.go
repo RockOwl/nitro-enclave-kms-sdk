@@ -15,7 +15,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -53,7 +52,7 @@ type Client struct {
 func (cli *Client) withSocksProxy() (*http.Client, error) {
 	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "can't connect to the proxy:", err)
+		fmt.Println("can't connect to the proxy:", err)
 		return nil, err
 	}
 
@@ -75,7 +74,8 @@ func (cli *Client) withHttpProxy() (*http.Client, error) {
 }
 
 func (cli *Client) init() error {
-	httpCli, _ := cli.withHttpProxy()
+	httpCli, _ := cli.withSocksProxy()
+	//httpCli, _ := cli.withHttpProxy()
 
 	cli.httpCli = httpCli
 
