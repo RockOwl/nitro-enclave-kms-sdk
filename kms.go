@@ -1,9 +1,7 @@
 package kms
 
 import (
-	"context"
 	crypto2 "crypto"
-	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/crypto"
@@ -12,16 +10,16 @@ import (
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/nitro"
 	_ "github.com/brodyxchen/nitro-enclave-kms-sdk/randseed"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/types"
-	"golang.org/x/net/proxy"
-	"io/ioutil"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/viproxy"
+	"github.com/mdlayher/vsock"
 	"net"
 	"net/http"
-	url2 "net/url"
-	"os"
+	"strconv"
 	"time"
 )
 
 const (
+	httpTimeout       = 180 * time.Second
 	amzDateTimeFormat = "20060102T150405Z"
 	amzDateFormat     = "20060102"
 
@@ -29,14 +27,16 @@ const (
 	DataKeySpecAes128 types.DataKeySpec = "AES_128"
 )
 
-func NewClient() (*Client, error) {
-	cli := &Client{}
+func NewClient(inPort, outPort int) (*Client, error) {
+	cli := &Client{
+		inTcpPort: inPort,
+		outVPort:  outPort,
+	}
 
 	err := cli.init()
 	if err != nil {
 		return nil, err
 	}
-	cli.health()
 	return cli, nil
 }
 
@@ -50,44 +50,50 @@ type Client struct {
 	rsaPubKey []byte // PKIXPublicKey
 
 	httpCli *http.Client
+
+	inTcpPort int // "443"
+	outVPort  int // "1443"
 }
 
-func (cli *Client) withSocksProxy() (*http.Client, error) {
-	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "can't connect to the proxy:", err)
-		return nil, err
-	}
-
-	dc := dialer.(interface {
-		DialContext(ctx context.Context, network, addr string) (net.Conn, error)
-	})
-
-	// setup a http client
-	httpTransport := &http.Transport{}
-	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 180}
-	// set our socks5 as the dialer
-	httpTransport.DialContext = dc.DialContext
-	return httpClient, nil
-}
+//func (cli *Client) withSocksProxy() (*http.Client, error) {
+//	dialer, err := proxy.SOCKS5("tcp", "127.0.0.1:1080", nil, proxy.Direct)
+//	if err != nil {
+//		fmt.Println("can't connect to the proxy:", err)
+//		return nil, err
+//	}
+//
+//	dc := dialer.(interface {
+//		DialContext(ctx context.Context, network, addr string) (net.Conn, error)
+//	})
+//
+//	// setup a http client
+//	httpTransport := &http.Transport{}
+//	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 180}
+//	// set our socks5 as the dialer
+//	httpTransport.DialContext = dc.DialContext
+//	return httpClient, nil
+//}
 func (cli *Client) withHttpProxy() (*http.Client, error) {
-	url := "http://127.0.0.1:443"
-	proxyUrl, _ := url2.Parse(url)
-	transport := &http.Transport{
-		Proxy:           http.ProxyURL(proxyUrl),
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
+	//url := "http://127.0.0.1:443"
+	//proxyUrl, _ := url2.Parse(url)
+	//transport := &http.Transport{
+	//	Proxy:           http.ProxyURL(proxyUrl),
+	//	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	//}
 
 	return &http.Client{
-		Transport: transport,
-		Timeout:   time.Second * 180,
+		//Transport: transport,
+		Timeout: httpTimeout,
 	}, nil
 }
 
 func (cli *Client) init() error {
 	httpCli, _ := cli.withHttpProxy()
-
 	cli.httpCli = httpCli
+
+	if err := cli.initProxy(); err != nil {
+		return err
+	}
 
 	priKey, pubKey, err := crypto.GenerateRsaKey(2048)
 	if err != nil {
@@ -102,32 +108,22 @@ func (cli *Client) init() error {
 	return nil
 }
 
-func (cli *Client) health() {
-	go func() {
-		for {
-			rsp, err := cli.httpCli.Get("http://www.baidu.com")
-			if err != nil {
-				fmt.Println("get http://baidu.com err : ", err)
-			} else {
-				body, err := ioutil.ReadAll(rsp.Body)
-				fmt.Printf("get http://baidu.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
-			}
+func (cli *Client) initProxy() error {
+	inAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:"+strconv.Itoa(cli.inTcpPort)) // tcp://127.0.0.1:1080
+	if err != nil {
+		return fmt.Errorf("failed to resolve proxy from config: %s", err)
+	}
 
-			time.Sleep(time.Second * 15)
-
-			rsp, err = cli.httpCli.Get("https://www.qq.com")
-			if err != nil {
-				fmt.Println("get https://qq.com err : ", err)
-			} else {
-				body, err := ioutil.ReadAll(rsp.Body)
-				fmt.Printf("get https://qq.com ok : rsp.body.len=%v, err=%v \n", len(body), err)
-			}
-
-			time.Sleep(time.Second * 15)
-		}
-
-	}()
-
+	tuple := &viproxy.Tuple{
+		InAddr:  inAddr,                                                        // tcp://127.0.0.1:443
+		OutAddr: &vsock.Addr{ContextID: uint32(3), Port: uint32(cli.outVPort)}, // vsock://3:1443
+	}
+	fmt.Printf("inAddr := %+v, outAddr := %+v\n", tuple.InAddr, tuple.OutAddr)
+	proxyCli := viproxy.NewVIProxy([]*viproxy.Tuple{tuple})
+	if err := proxyCli.Start(); err != nil { // 监听tcp://127.0.0.1:443,  转发到  vsock://3:1443
+		return fmt.Errorf("failed to start VIProxy: %s", err)
+	}
+	return nil
 }
 
 func (cli *Client) SetRegion(region string) {

@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	cli, err := kms.NewClient()
+	cli, err := kms.NewClient(443, 1443)
 	if err != nil {
 		panic(err)
 	}
