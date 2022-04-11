@@ -3,6 +3,7 @@ package kms
 import (
 	"context"
 	crypto2 "crypto"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/crypto"
@@ -15,6 +16,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	url2 "net/url"
 	"os"
 	"time"
 )
@@ -69,8 +71,16 @@ func (cli *Client) withSocksProxy() (*http.Client, error) {
 	return httpClient, nil
 }
 func (cli *Client) withHttpProxy() (*http.Client, error) {
+	url := "http://127.0.0.1:443"
+	proxyUrl, _ := url2.Parse(url)
+	transport := &http.Transport{
+		Proxy:           http.ProxyURL(proxyUrl),
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	return &http.Client{
-		Timeout: time.Second * 180,
+		Transport: transport,
+		Timeout:   time.Second * 180,
 	}, nil
 }
 
