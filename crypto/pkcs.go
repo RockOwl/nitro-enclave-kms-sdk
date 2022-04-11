@@ -11,8 +11,8 @@ import (
 
 func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data []byte) ([]byte, error) {
 
-	b64 := base64.StdEncoding.EncodeToString(data)
-	fmt.Println("EnvelopedRecipientB64 : ", b64)
+	fmt.Println("EnvelopedRecipient : ", string(data))
+	fmt.Println("EnvelopedRecipientB64 : ", base64.StdEncoding.EncodeToString(data))
 
 	pkcs, err := pkcs7.Parse(data)
 	if err != nil {
