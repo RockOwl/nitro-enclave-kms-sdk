@@ -3,6 +3,7 @@ package kms
 import (
 	"context"
 	crypto2 "crypto"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/crypto"
@@ -61,10 +62,14 @@ func (cli *Client) withSocksProxy() (*http.Client, error) {
 	})
 
 	// setup a http client
-	httpTransport := &http.Transport{}
+	httpTransport := &http.Transport{
+		Proxy:           nil,
+		DialContext:     dc.DialContext, // set our socks5 as the dialer
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+
 	httpClient := &http.Client{Transport: httpTransport, Timeout: time.Second * 180}
-	// set our socks5 as the dialer
-	httpTransport.DialContext = dc.DialContext
+
 	return httpClient, nil
 }
 func (cli *Client) withHttpProxy() (*http.Client, error) {
