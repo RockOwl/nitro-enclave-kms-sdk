@@ -16,6 +16,7 @@ import (
 // https://docs.aws.amazon.com/zh_cn/general/latest/gr/sigv4-create-canonical-request.html
 
 func (cli *Client) callKms(target string, reqPtr interface{}, rspPtr interface{}) error {
+	fmt.Println("kms.callKms target : ", target)
 	url := fmt.Sprintf("https://kms.%s.amazonaws.com/", cli.region)
 
 	reqData, err := json.Marshal(reqPtr)

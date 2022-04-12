@@ -219,11 +219,11 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 		return nil, err
 	}
 	req := &models.DecryptRequest{
-		CiphertextBlob: ciphertextBlob,
-		//EncryptionAlgorithm: "",
-		GrantTokens: []string{cli.sessionToken},
-		KeyId:       kmsKeyId,
-		Recipient:   recipient,
+		CiphertextBlob:      ciphertextBlob,
+		EncryptionAlgorithm: types.EncryptionAlgorithmSpecSymmetricDefault,
+		GrantTokens:         []string{cli.sessionToken},
+		KeyId:               kmsKeyId,
+		Recipient:           recipient,
 	}
 
 	var rsp models.DecryptResponse
