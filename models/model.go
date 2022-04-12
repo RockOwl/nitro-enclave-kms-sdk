@@ -36,7 +36,7 @@ type GenerateDataKeyRequest struct {
 	Recipient   *RecipientInfo    `json:"Recipient,omitempty"`
 }
 type GenerateDataKeyResponse struct {
-	CiphertextBlob []byte
+	CiphertextBlob string
 	KeyId          string
 
 	Plaintext              string // enclave-kms中，此为null

@@ -202,7 +202,7 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 
 	if env.IsLocal() {
 		fmt.Println("rsp : ", rsp)
-		return []byte(rsp.Plaintext), rsp.CiphertextBlob, nil
+		return []byte(rsp.Plaintext), []byte(rsp.CiphertextBlob), nil
 	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
@@ -210,7 +210,7 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 		return nil, nil, err
 	}
 
-	return plainBytes, rsp.CiphertextBlob, nil
+	return plainBytes, []byte(rsp.CiphertextBlob), nil
 }
 
 func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, error) {
