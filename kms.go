@@ -168,7 +168,8 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 	}
 
 	if env.IsLocal() {
-		return rsp.Plaintext, nil
+		fmt.Println("rsp : ", rsp)
+		return []byte(rsp.Plaintext), nil
 	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
@@ -200,7 +201,8 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 	}
 
 	if env.IsLocal() {
-		return rsp.Plaintext, rsp.CiphertextBlob, nil
+		fmt.Println("rsp : ", rsp)
+		return []byte(rsp.Plaintext), rsp.CiphertextBlob, nil
 	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)

@@ -25,7 +25,7 @@ type GenerateRandomRequest struct {
 }
 
 type GenerateRandomResponse struct {
-	Plaintext              []byte // enclave-kms中，此为null
+	Plaintext              string // enclave-kms中，此为null
 	CiphertextForRecipient []byte // enclave-kms中，返回这个, Base64 编码的二进制数据对象
 }
 
@@ -39,7 +39,7 @@ type GenerateDataKeyResponse struct {
 	CiphertextBlob []byte
 	KeyId          string
 
-	Plaintext              []byte // enclave-kms中，此为null
+	Plaintext              string // enclave-kms中，此为null
 	CiphertextForRecipient []byte // enclave-kms中，返回这个
 }
 
