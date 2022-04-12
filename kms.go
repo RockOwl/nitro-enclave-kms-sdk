@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/crypto"
+	"github.com/brodyxchen/nitro-enclave-kms-sdk/env"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/log"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/models"
 	"github.com/brodyxchen/nitro-enclave-kms-sdk/nitro"
@@ -25,9 +26,14 @@ const (
 
 	DataKeySpecAes256 types.DataKeySpec = "AES_256"
 	DataKeySpecAes128 types.DataKeySpec = "AES_128"
+
+	LocalEnv   = env.LocalEnv
+	ReleaseEnv = env.ReleaseEnv
 )
 
-func NewClient(inPort, outPort int) (*Client, error) {
+func NewClient(inEnv env.Env, inPort, outPort int) (*Client, error) {
+	env.Set(inEnv)
+
 	cli := &Client{
 		inTcpPort: inPort,
 		outVPort:  outPort,
@@ -109,6 +115,10 @@ func (cli *Client) init() error {
 }
 
 func (cli *Client) initProxy() error {
+	if env.IsLocal() {
+		return nil
+	}
+
 	inAddr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:"+strconv.Itoa(cli.inTcpPort)) // tcp://127.0.0.1:1080
 	if err != nil {
 		return fmt.Errorf("failed to resolve proxy from config: %s", err)
@@ -148,7 +158,7 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 	}
 	req := &models.GenerateRandomRequest{
 		NumberOfBytes: byteCount,
-		Recipient:     *recipient,
+		Recipient:     recipient,
 	}
 
 	var rsp models.GenerateRandomResponse
@@ -157,6 +167,9 @@ func (cli *Client) GenerateRandom(byteCount int) ([]byte, error) {
 		return nil, err
 	}
 
+	if env.IsLocal() {
+		return rsp.Plaintext, nil
+	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
 	if err != nil {
@@ -177,7 +190,7 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 		KeyId:       kmsKeyId,
 		GrantTokens: []string{cli.sessionToken},
 		KeySpec:     keySpec,
-		Recipient:   *recipient,
+		Recipient:   recipient,
 	}
 
 	var rsp models.GenerateDataKeyResponse
@@ -186,6 +199,9 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 		return nil, nil, err
 	}
 
+	if env.IsLocal() {
+		return rsp.Plaintext, rsp.CiphertextBlob, nil
+	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
 	if err != nil {
@@ -207,7 +223,7 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 		//EncryptionAlgorithm: "",
 		GrantTokens: []string{cli.sessionToken},
 		KeyId:       kmsKeyId,
-		Recipient:   *recipient,
+		Recipient:   recipient,
 	}
 
 	var rsp models.DecryptResponse
@@ -216,6 +232,9 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 		return nil, err
 	}
 
+	if env.IsLocal() {
+		return rsp.Plaintext, nil
+	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
 	if err != nil {
@@ -226,6 +245,9 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 }
 
 func (cli *Client) withRecipientInfo() (*models.RecipientInfo, error) {
+	if env.IsLocal() {
+		return nil, nil
+	}
 	nonceStr := crypto.RandomString(16)
 	attest, err := nitro.Attest([]byte(nonceStr), []byte("key-creator"), cli.rsaPubKey)
 	if err != nil {

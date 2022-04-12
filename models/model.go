@@ -21,7 +21,7 @@ type RecipientInfo struct {
 type GenerateRandomRequest struct {
 	NumberOfBytes int `json:"NumberOfBytes"`
 
-	Recipient RecipientInfo `json:"Recipient"`
+	Recipient *RecipientInfo `json:"Recipient,omitempty"`
 }
 
 type GenerateRandomResponse struct {
@@ -33,7 +33,7 @@ type GenerateDataKeyRequest struct {
 	KeyId       string
 	GrantTokens []string
 	KeySpec     types.DataKeySpec // AES_128  AES_256
-	Recipient   RecipientInfo     `json:"Recipient"`
+	Recipient   *RecipientInfo    `json:"Recipient,omitempty"`
 }
 type GenerateDataKeyResponse struct {
 	CiphertextBlob []byte
@@ -48,7 +48,7 @@ type DecryptRequest struct {
 	EncryptionAlgorithm types.EncryptionAlgorithmSpec
 	GrantTokens         []string
 	KeyId               string
-	Recipient           RecipientInfo `json:"Recipient"`
+	Recipient           *RecipientInfo `json:"Recipient,omitempty"`
 }
 type DecryptResponse struct {
 	EncryptionAlgorithm types.EncryptionAlgorithmSpec
