@@ -54,6 +54,6 @@ type DecryptResponse struct {
 	EncryptionAlgorithm types.EncryptionAlgorithmSpec
 	KeyId               string
 
-	Plaintext              []byte // enclave-kms中，此为null
+	Plaintext              string // enclave-kms中，此为null
 	CiphertextForRecipient []byte // enclave-kms中，返回这个		// base64加密后的，需要解密
 }
