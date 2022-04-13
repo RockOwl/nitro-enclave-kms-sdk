@@ -9,11 +9,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data []byte) ([]byte, error) {
-	fmt.Println("EnvelopedRecipient : ", string(data))
-	fmt.Println("EnvelopedRecipientB64 : ", base64.StdEncoding.EncodeToString(data))
+func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data string) ([]byte, error) {
+	fmt.Println("EnvelopedRecipient : ", data)
 
-	pkcs, err := pkcs7.Parse(data)
+	recipient, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+	pkcs, err := pkcs7.Parse(recipient)
 	if err != nil {
 		log.Error("DecryptEnvelopedRecipient() pkcs7.Parse err : ", err)
 		return nil, errors.WithStack(err)
