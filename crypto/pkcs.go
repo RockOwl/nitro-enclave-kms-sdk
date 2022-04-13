@@ -22,7 +22,7 @@ func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data string) ([]byte, e
 		return nil, errors.WithStack(err)
 	}
 
-	outBytes, err := pkcs.DecryptWithNoCert(priKey)
+	outBytes, err := pkcs.DecryptWithNoCert(priKey) // plain  not b64
 	if err != nil {
 		log.Error("DecryptEnvelopedRecipient() pkcs.DecryptWithNoCert err : ", err)
 		return nil, errors.WithStack(err)

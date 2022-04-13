@@ -235,8 +235,9 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 	}
 
 	if env.IsLocal() {
-		fmt.Println("rsp : ", rsp)
-		return []byte(rsp.Plaintext), nil
+		fmt.Println("rspLocal : ", rsp) // plainB64
+		plainBytes, _ := base64.StdEncoding.DecodeString(rsp.Plaintext)
+		return plainBytes, nil
 	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
