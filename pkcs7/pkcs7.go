@@ -74,12 +74,30 @@ type envelopedData struct {
 	EncryptedContentInfo encryptedContentInfo
 }
 
+//type recipientInfo struct {
+//	Version                int
+//	IssuerAndSerialNumber  issuerAndSerial
+//	KeyEncryptionAlgorithm pkix.AlgorithmIdentifier
+//	EncryptedKey           []byte
+//}
+//type recipientInfo struct {
+//	Version int
+//	XXXX    asn1.RawValue `asn1:"optional,tag:0"`
+//	//IssuerAndSerialNumber  issuerAndSerial
+//	KeyEncryptionAlgorithm pkix.AlgorithmIdentifier
+//	EncryptedKey           []byte
+//}
+
+type SubjectKeyIdentifier []byte
 type recipientInfo struct {
 	Version                int
-	IssuerAndSerialNumber  issuerAndSerial
+	IssuerAndSerialNumber  issuerAndSerial      `asn1:"optional"`
+	SubjectKeyIdentifier   SubjectKeyIdentifier `asn1:"tag:0,implicit,optional"`
 	KeyEncryptionAlgorithm pkix.AlgorithmIdentifier
 	EncryptedKey           []byte
 }
+
+//这样可以同时支持IssuerAndSerialNumber 和SubjectKeyIdentifier
 
 type encryptedContentInfo struct {
 	ContentType                asn1.ObjectIdentifier

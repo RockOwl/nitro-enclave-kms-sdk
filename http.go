@@ -33,6 +33,8 @@ func (cli *Client) callKms(target string, reqPtr interface{}, rspPtr interface{}
 		return err
 	}
 
+	fmt.Println("rspBody : ", rspData)
+
 	err = json.Unmarshal(rspData, rspPtr)
 	if err != nil {
 		log.Error("callKms() json.Unmarshal err : ", err)
