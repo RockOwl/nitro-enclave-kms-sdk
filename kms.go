@@ -239,7 +239,9 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 		return []byte(rsp.Plaintext), nil
 	}
 	// enveloped_data  by pkcs asn.1
-	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
+
+	recipientStr := rsp.CiphertextForRecipient
+	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, []byte(recipientStr))
 	if err != nil {
 		return nil, err
 	}

@@ -10,7 +10,6 @@ import (
 )
 
 func DecryptEnvelopedRecipient(priKey crypto.PrivateKey, data []byte) ([]byte, error) {
-
 	fmt.Println("EnvelopedRecipient : ", string(data))
 	fmt.Println("EnvelopedRecipientB64 : ", base64.StdEncoding.EncodeToString(data))
 

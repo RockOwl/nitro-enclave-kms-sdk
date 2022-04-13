@@ -33,13 +33,13 @@ func (cli *Client) callKms(target string, reqPtr interface{}, rspPtr interface{}
 		return err
 	}
 
-	fmt.Println("rspBody : ", rspData)
-
 	err = json.Unmarshal(rspData, rspPtr)
 	if err != nil {
 		log.Error("callKms() json.Unmarshal err : ", err)
 		return errors.WithStack(err)
 	}
+
+	fmt.Printf("rspBody : %+v\n", rspPtr)
 	return nil
 }
 
@@ -116,8 +116,8 @@ func (cli *Client) withHeaders(target string, reqData []byte) map[string]string 
 
 func (cli *Client) httpPost(url string, reqBody []byte, headers map[string]string) ([]byte, error) {
 	fmt.Printf("kmsCli.httpPost() url=%v\n", url)
-	fmt.Printf("kmsCli.httpPost() req=%+v\n", string(reqBody))
-	fmt.Printf("kmsCli.httpPost() headers=%+v\n", headers)
+	//fmt.Printf("kmsCli.httpPost() req=%+v\n", string(reqBody))
+	//fmt.Printf("kmsCli.httpPost() headers=%+v\n", headers)
 
 	req, err := http.NewRequest("POST", url, strings.NewReader(string(reqBody)))
 	if err != nil {
