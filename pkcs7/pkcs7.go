@@ -10,6 +10,7 @@ import (
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
@@ -388,10 +389,13 @@ func (p7 *PKCS7) DecryptWithNoCert(pk crypto.PrivateKey) ([]byte, error) {
 	}
 	if priv := pk.(*rsa.PrivateKey); priv != nil {
 		var contentKey []byte
-		contentKey, err := rsa.DecryptPKCS1v15(rand.Reader, priv, recipient.EncryptedKey)
+		//contentKey, err := rsa.DecryptPKCS1v15(rand.Reader, priv, recipient.EncryptedKey)
+
+		contentKey, err := rsa.DecryptOAEP(sha1.New(), rand.Reader, priv, recipient.EncryptedKey, nil)
 		if err != nil {
 			return nil, err
 		}
+
 		return data.EncryptedContentInfo.decrypt(contentKey)
 	}
 	fmt.Printf("Unsupported Private Key: %v\n", pk)
