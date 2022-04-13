@@ -200,9 +200,19 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 		return nil, nil, err
 	}
 
+	cipherBytes, err := base64.StdEncoding.DecodeString(rsp.CiphertextBlob)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	if env.IsLocal() {
-		fmt.Println("rsp : ", rsp)
-		return []byte(rsp.Plaintext), []byte(rsp.CiphertextBlob), nil
+		fmt.Println("rsp : ", rsp) // b64
+		plainBytes, err := base64.StdEncoding.DecodeString(rsp.Plaintext)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return plainBytes, cipherBytes, nil
 	}
 	// enveloped_data  by pkcs asn.1
 	plainBytes, err := crypto.DecryptEnvelopedRecipient(cli.rsaKey, rsp.CiphertextForRecipient)
@@ -210,7 +220,7 @@ func (cli *Client) GenerateDataKey(keySpec types.DataKeySpec, kmsKeyId string) (
 		return nil, nil, err
 	}
 
-	return plainBytes, []byte(rsp.CiphertextBlob), nil
+	return plainBytes, cipherBytes, nil
 }
 
 func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, error) {
@@ -236,7 +246,10 @@ func (cli *Client) Decrypt(ciphertextBlob []byte, kmsKeyId string) ([]byte, erro
 
 	if env.IsLocal() {
 		fmt.Println("rspLocal : ", rsp) // plainB64
-		plainBytes, _ := base64.StdEncoding.DecodeString(rsp.Plaintext)
+		plainBytes, err := base64.StdEncoding.DecodeString(rsp.Plaintext)
+		if err != nil {
+			return nil, err
+		}
 		return plainBytes, nil
 	}
 	// enveloped_data  by pkcs asn.1
